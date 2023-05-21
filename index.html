@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Fire Risk Prediction</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible">
+  <title>Predicción Riesgos de Incendios Forestales</title>
 </head>
 <body>
-  <h1>Fire Risk Prediction</h1>
-  <label for="coordinates">Enter Coordinates:</label>
-  <input type="text" id="coordinates" placeholder="Latitude, Longitude">
-  <button id="predictBtn">Predict</button>
+  <h1>Predicción Riesgos de Incendios Forestales</h1>
+  <div>
+    <label for="coordinates">Introducir Coordenadas:</label>
+    <input type="text" id="coordinates" placeholder="Latitud, Longitud">
+    <button id="predictBtn">Predecir</button>
+  </div>
+  <br>
+  <div>Resultado:</div>
+  <br>
   <div id="result"></div>
 
   <!-- Include TensorFlow.js library -->
