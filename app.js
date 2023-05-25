@@ -1,17 +1,28 @@
-let points_data = null;
-
-// Fetch the GeoJSON file
-fetch('data/points_data.geojson')
-  .then(response => response.json())
-  .then(data => {
-    points_data = JSON.parse(JSON.stringify(data));
-    document.getElementById('predictBtn').disabled = false;
-  });
-
 document.addEventListener("DOMContentLoaded", function() {
+  // Constants for near point
+  const EARTH_RADIUS = 6371; // Radius of the Earth in kilometers
+
+  // Constants for specific humidity
+  const MOLECULAR_WEIGHT_WATER = 18.01528; // g/mol
+  const GAS_CONSTANT_GRAMS = 8314; // J/(g·K)
+
+  // Section to display the result
+  let resultDiv = document.getElementById("result");
+
+  let points_data = null;
+
+  // Fetch the GeoJSON file
+  fetch('data/points_data.geojson')
+    .then(response => response.json())
+    .then(data => {
+      points_data = JSON.parse(JSON.stringify(data));
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main').style.display = 'block';
+      document.getElementById('predictBtn').disabled = false;
+      document.getElementById('coordinates').disabled = false;
+    });
 
   function calculateDistance(lat1, lon1, lat2, lon2) {
-    const earthRadius = 6371; // Radius of the Earth in kilometers
     const dLat = degreesToRadians(lat2 - lat1);
     const dLon = degreesToRadians(lon2 - lon1);
   
@@ -23,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
         Math.sin(dLon / 2);
   
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = earthRadius * c;
+    const distance = EARTH_RADIUS * c;
   
     return distance;
   }
@@ -64,11 +75,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Function to calculate specific humidity (in grams of water vapor per kilogram of air)
   function calculateSpecificHumidity(temperature, relativeHumidity) {
-    // Constants for the calculation
-    const molecularWeightWater = 18.01528; // g/mol
-    const gasConstant = 8.314; // J/(mol·K)
-    const gasConstantGrams = gasConstant * 1000; // J/(g·K)
-
     // Convert temperature to Kelvin
     const temperatureKelvin = temperature + 273.15;
 
@@ -79,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const e = (relativeHumidity / 100) * eSat;
 
     // Calculate the specific humidity
-    const specificHumidity = (molecularWeightWater * e) / (gasConstantGrams * (temperatureKelvin - 273.15));
+    const specificHumidity = (MOLECULAR_WEIGHT_WATER * e) / (GAS_CONSTANT_GRAMS * (temperatureKelvin - 273.15));
 
     return specificHumidity;
   }
@@ -117,21 +123,21 @@ document.addEventListener("DOMContentLoaded", function() {
       .then(response => response.json())
       .then(data => {
         // Process the weather data
+        const meteorologicalData = {
+          temperature: data.main.temp_max,
+          uComponentOfWind: data.wind.speed*Math.cos(data.wind.deg),
+          vComponentOfWind: data.wind.speed*Math.sin(data.wind.deg),
+          specificHumidity: calculateSpecificHumidity(data.main.temp, data.main.humidity),
+          relativeHumidity: data.main.humidity
+        };
+
         // const meteorologicalData = {
-        //   temperature: data.main.temp_max,
+        //   temperature: 305,
         //   uComponentOfWind: data.wind.speed*Math.cos(data.wind.deg),
         //   vComponentOfWind: data.wind.speed*Math.sin(data.wind.deg),
         //   specificHumidity: calculateSpecificHumidity(data.main.temp, data.main.humidity),
         //   relativeHumidity: data.main.humidity
         // };
-
-        const meteorologicalData = {
-          temperature: 305,
-          uComponentOfWind: 5,
-          vComponentOfWind: -2,
-          specificHumidity: calculateSpecificHumidity(data.main.temp, 30),
-          relativeHumidity: 30
-        };
 
         return meteorologicalData;
       })
@@ -159,8 +165,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Function to handle the prediction
   async function predict() {
     const coordinatesInput = document.getElementById("coordinates").value;
-    // Display the result
-    const resultDiv = document.getElementById("result");
 
     if (!coordinatesInput) {
       resultDiv.textContent = "Please enter coordinates.";
@@ -212,6 +216,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // const inputDataArr = [{ altitud: 546.37, pendiente: 21.421358, orientacion: 80.22286, t_max: 300.30322265625, u: 4.351698398590088, v: 6.368526458740234, specific_humidity: 0.005158774554729462, relative_humidity: 27.214874267578125 }]
     console.log('inputData', inputData);
 
+    resultDiv.textContent = 'Cargando...';
+
     // Load the model
     const model = await loadModel();
 
@@ -226,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const fireRiskDictionary = {0: 'No hay riesgo de incendio', 1: 'Hay riesgo de incendio'}
 
-    resultDiv.innerHTML = `${fireRiskDictionary[fireRisk]}`;
+    resultDiv.textContent = `${fireRiskDictionary[fireRisk]}`;
   }
 
   // Event listener for the predict button

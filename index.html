@@ -7,16 +7,19 @@
   <title>Predicción Riesgos de Incendios Forestales</title>
 </head>
 <body>
-  <h1>Predicción Riesgos de Incendios Forestales</h1>
-  <div>
-    <label for="coordinates">Introducir Coordenadas:</label>
-    <input type="text" id="coordinates" placeholder="Latitud, Longitud">
-    <button id="predictBtn" disabled>Predecir</button>
+  <h1>Riesgo de Incendios Forestales en la Comunidad Valenciana</h1>
+  <div id="loading">Cargando...</div>
+  <div id="main" style="display: none">
+    <div>
+      <label for="coordinates">Introducir Coordenadas:</label>
+      <input type="text" id="coordinates" placeholder="Latitud, Longitud" disabled>
+      <button id="predictBtn" disabled>Predecir</button>
+    </div>
+    <br>
+    <div>Resultado:</div>
+    <br>
+    <div id="result"></div>
   </div>
-  <br>
-  <div>Resultado:</div>
-  <br>
-  <div id="result"></div>
 
   <!-- Include TensorFlow.js library -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js"></script>
