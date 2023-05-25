@@ -22,6 +22,25 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById('coordinates').disabled = false;
     });
 
+  // Initialize the map
+  const map = L.map('map').setView([38.907, -77.037], 13);
+
+  // Add a tile layer (e.g., OpenStreetMap)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    maxZoom: 18,
+  }).addTo(map);
+
+  // Add a click event listener to the map
+  map.on('click', function (e) {
+    // Get the clicked coordinates
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+
+    // Update the input field with the coordinates
+    document.getElementById('coordinates').value = lat + ', ' + lng;
+  });
+
   function calculateDistance(lat1, lon1, lat2, lon2) {
     const dLat = degreesToRadians(lat2 - lat1);
     const dLon = degreesToRadians(lon2 - lon1);
