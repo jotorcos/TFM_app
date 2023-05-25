@@ -2,19 +2,89 @@ document.addEventListener("DOMContentLoaded", function() {
   // Define the API endpoint for elevation data
   // const elevationAPI = "https://api.open-elevation.com/api/v1/lookup";
   const elevationAPI = "https://api.open-meteo.com/v1/elevation";
+
+  // Mapbox Elevation API endpoint
+  const elevationAndSlopeAPI = 'https://api.open-elevation.com/api/v1/lookup';
+
   // Define the API endpoint for meteorological data
   const cdsAPI = "https://cds.climate.copernicus.eu/api/v2";
 
-  // Function to get the elevation for given coordinates
-  async function getElevation(latitude, longitude) {
-    // const url = `${elevationAPI}?locations=${latitude},${longitude}`;
-    const url = `${elevationAPI}?latitude=${latitude}&longitude=${longitude}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    // const elevation = data.results[0].elevation;
-    const elevation = data.elevation[0];
-    return elevation;
+  const bio = {};
+
+
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const earthRadius = 6371; // Radius of the Earth in kilometers
+    const dLat = degreesToRadians(lat2 - lat1);
+    const dLon = degreesToRadians(lon2 - lon1);
+  
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(degreesToRadians(lat1)) *
+        Math.cos(degreesToRadians(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+  
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadius * c;
+  
+    return distance;
   }
+  
+  function degreesToRadians(degrees) {
+    return (degrees * Math.PI) / 180;
+  }
+
+  async function findNearestPoint(userLatitude, userLongitude) {
+    let nearestPoint = null;
+    let minDistance = Infinity;
+
+    try {
+      const response = await fetch('data/points_data.geojson');
+      if (!response.ok) {
+        throw new Error('Failed to fetch GeoJSON file');
+      }
+      const data = await response.json();
+      
+      // Handle the loaded GeoJSON data
+      console.log(data); // Example: Log the loaded GeoJSON data
+      // Perform any further processing with the GeoJSON data
+      data.features.forEach(feature => {
+        if (feature.geometry.type === 'Point') {
+          const [pointLongitude, pointLatitude] = feature.geometry.coordinates;
+    
+          // Calculate the distance between the user's input and the current point
+          const distance = calculateDistance(userLatitude, userLongitude, pointLatitude, pointLongitude);
+    
+          // Check if the current point is closer than the previous closest point
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestPoint = feature;
+          }
+        }
+      });
+
+      const altitud = nearestPoint.properties.altitud;
+      const pendiente = nearestPoint.properties.pendiente;
+      const orientacion = nearestPoint.properties.orientacion;
+      const n_CLAIFN = nearestPoint.properties.n_CLAIFN;
+      return { altitud, pendiente, orientacion, n_CLAIFN };
+
+    } catch (error) {
+      console.error('Error loading GeoJSON file:', error);
+    }
+  }
+  
+
+  // Function to get the elevation for given coordinates
+  // async function getElevation(latitude, longitude) {
+  //   // const url = `${elevationAPI}?locations=${latitude},${longitude}`;
+  //   const url = `${elevationAPI}?latitude=${latitude}&longitude=${longitude}`;
+  //   const response = await fetch(url);
+  //   const data = await response.json();
+  //   // const elevation = data.results[0].elevation;
+  //   const elevation = data.elevation[0];
+  //   return elevation;
+  // }
 
   // // Function to get meteorological data for given coordinates
   // async function getMeteorologicalData(latitude, longitude) {
@@ -49,81 +119,91 @@ document.addEventListener("DOMContentLoaded", function() {
   //   return meteorologicalData;
   // }
 
+  // Fetch the GeoJSON file
+  // fetch('data/bio_grouped.geojson')
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     bio = data;
+  //     console.log('bio', bio)
+  // });
 
-// Function to calculate specific humidity (in grams of water vapor per kilogram of air)
-function calculateSpecificHumidity(temperature, relativeHumidity) {
-  // Constants for the calculation
-  const molecularWeightWater = 18.01528; // g/mol
-  const gasConstant = 8.314; // J/(mol·K)
-  const gasConstantGrams = gasConstant * 1000; // J/(g·K)
 
-  // Convert temperature to Kelvin
-  const temperatureKelvin = temperature + 273.15;
+  // Function to calculate specific humidity (in grams of water vapor per kilogram of air)
+  function calculateSpecificHumidity(temperature, relativeHumidity) {
+    // Constants for the calculation
+    const molecularWeightWater = 18.01528; // g/mol
+    const gasConstant = 8.314; // J/(mol·K)
+    const gasConstantGrams = gasConstant * 1000; // J/(g·K)
 
-  // Calculate the saturation vapor pressure (e_sat) using the Clausius-Clapeyron equation
-  const eSat = 610.78 * Math.exp((17.2694 * (temperature - 273.16)) / (temperature - 35.86));
+    // Convert temperature to Kelvin
+    const temperatureKelvin = temperature + 273.15;
 
-  // Calculate the vapor pressure (e) using the relative humidity
-  const e = (relativeHumidity / 100) * eSat;
+    // Calculate the saturation vapor pressure (e_sat) using the Clausius-Clapeyron equation
+    const eSat = 610.78 * Math.exp((17.2694 * (temperature - 273.16)) / (temperature - 35.86));
 
-  // Calculate the specific humidity
-  const specificHumidity = (molecularWeightWater * e) / (gasConstantGrams * (temperatureKelvin - 273.15));
+    // Calculate the vapor pressure (e) using the relative humidity
+    const e = (relativeHumidity / 100) * eSat;
 
-  return specificHumidity;
-}
+    // Calculate the specific humidity
+    const specificHumidity = (molecularWeightWater * e) / (gasConstantGrams * (temperatureKelvin - 273.15));
 
-function getMeteorologicalData(latitude, longitude, timestamp) {
-  // const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
-  const apiUrl = `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${timestamp}&appid=${apiKey}`;
-  // const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
+    return specificHumidity;
+  }
 
-  return fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
-      // Process the weather data
-      const meteorologicalData = {
-        temperature: data.current.temp,
-        uComponentOfWind: data.current.wind_speed*Math.cos(data.current.wind_deg),
-        vComponentOfWind: data.current.wind_speed*Math.sin(data.current.wind_deg),
-        specificHumidity: calculateSpecificHumidity(data.current.temp, data.current.humidity),
-        relativeHumidity: data.current.humidity
-      };
+  function getMeteorologicalData(latitude, longitude, timestamp) {
+    const apiKey = 'c3034e02ba05fd3aec1bc080872ba8c6';
+    // const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${timestamp}&appid=${apiKey}`;
+    // const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
 
-      return meteorologicalData;
-    })
-    .catch(error => {
-      console.log("Error fetching weather data:", error);
-    });
-}
+    return fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        // Process the weather data
+        const meteorologicalData = {
+          temperature: data.current.temp,
+          uComponentOfWind: data.current.wind_speed*Math.cos(data.current.wind_deg),
+          vComponentOfWind: data.current.wind_speed*Math.sin(data.current.wind_deg),
+          specificHumidity: calculateSpecificHumidity(data.current.temp, data.current.humidity),
+          relativeHumidity: data.current.humidity
+        };
 
-function getMeteorologicalData(latitude, longitude, timestamp) {
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
+        return meteorologicalData;
+      })
+      .catch(error => {
+        console.log("Error fetching weather data:", error);
+      });
+  }
 
-  return fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
-      // Process the weather data
-      const meteorologicalData = {
-        temperature: data.main.temp_max,
-        uComponentOfWind: data.wind.speed*Math.cos(data.wind.deg),
-        vComponentOfWind: data.wind.speed*Math.sin(data.wind.deg),
-        specificHumidity: calculateSpecificHumidity(data.main.temp, data.main.humidity),
-        relativeHumidity: data.main.humidity
-      };
+  function getMeteorologicalData(latitude, longitude, timestamp) {
+    const apiKey = 'c3034e02ba05fd3aec1bc080872ba8c6';
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
 
-      return meteorologicalData;
-    })
-    .catch(error => {
-      console.log("Error fetching weather data:", error);
-    });
-}
+    return fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        // Process the weather data
+        const meteorologicalData = {
+          temperature: data.main.temp_max,
+          uComponentOfWind: data.wind.speed*Math.cos(data.wind.deg),
+          vComponentOfWind: data.wind.speed*Math.sin(data.wind.deg),
+          specificHumidity: calculateSpecificHumidity(data.main.temp, data.main.humidity),
+          relativeHumidity: data.main.humidity
+        };
+
+        return meteorologicalData;
+      })
+      .catch(error => {
+        console.log("Error fetching weather data:", error);
+      });
+  }
 
 
   // Load the TensorFlow.js model
   async function loadModel() {
     // const modelJson = {"format": "layers-model", "generatedBy": "keras v2.12.0", "convertedBy": "TensorFlow.js Converter v4.6.0", "modelTopology": {"keras_version": "2.12.0", "backend": "tensorflow", "model_config": {"class_name": "Sequential", "config": {"name": "sequential", "layers": [{"class_name": "InputLayer", "config": {"batch_input_shape": [null, 8], "dtype": "float32", "sparse": false, "ragged": false, "name": "dense_input"}}, {"class_name": "Dense", "config": {"name": "dense", "trainable": true, "dtype": "float32", "batch_input_shape": [null, 8], "units": 64, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_1", "trainable": true, "dtype": "float32", "units": 128, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_1", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_2", "trainable": true, "dtype": "float32", "units": 256, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_2", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_3", "trainable": true, "dtype": "float32", "units": 128, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_3", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_4", "trainable": true, "dtype": "float32", "units": 64, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_4", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_5", "trainable": true, "dtype": "float32", "units": 2, "activation": "softmax", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": null, "bias_constraint": null}}]}}, "training_config": {"loss": "sparse_categorical_crossentropy", "metrics": [[{"class_name": "MeanMetricWrapper", "config": {"name": "accuracy", "dtype": "float32", "fn": "sparse_categorical_accuracy"}}]], "weighted_metrics": null, "loss_weights": null, "optimizer_config": {"class_name": "Custom>Adamax", "config": {"name": "Adamax", "weight_decay": null, "clipnorm": null, "global_clipnorm": null, "clipvalue": null, "use_ema": false, "ema_momentum": 0.99, "ema_overwrite_frequency": null, "jit_compile": false, "is_legacy_optimizer": false, "learning_rate": 0.0010000000474974513, "beta_1": 0.9, "beta_2": 0.999, "epsilon": 1e-07}}}}, "weightsManifest": [{"paths": ["group1-shard1of1.bin"], "weights": [{"name": "dense/kernel", "shape": [8, 64], "dtype": "float32"}, {"name": "dense/bias", "shape": [64], "dtype": "float32"}, {"name": "dense_1/kernel", "shape": [64, 128], "dtype": "float32"}, {"name": "dense_1/bias", "shape": [128], "dtype": "float32"}, {"name": "dense_2/kernel", "shape": [128, 256], "dtype": "float32"}, {"name": "dense_2/bias", "shape": [256], "dtype": "float32"}, {"name": "dense_3/kernel", "shape": [256, 128], "dtype": "float32"}, {"name": "dense_3/bias", "shape": [128], "dtype": "float32"}, {"name": "dense_4/kernel", "shape": [128, 64], "dtype": "float32"}, {"name": "dense_4/bias", "shape": [64], "dtype": "float32"}, {"name": "dense_5/kernel", "shape": [64, 2], "dtype": "float32"}, {"name": "dense_5/bias", "shape": [2], "dtype": "float32"}]}]};
     // const model = await tf.loadLayersModel(modelJson);
-    const model = await tf.loadLayersModel("model_6/model.json");
+    const model = await tf.loadLayersModel("model_26_optimized/model.json");
     return model;
   }
 
@@ -148,20 +228,37 @@ function getMeteorologicalData(latitude, longitude, timestamp) {
     const [latitude, longitude] = coordinatesInput.split(",").map(coord => parseFloat(coord.trim()));
 
     // Get the elevation for the coordinates
-    const elevation = await getElevation(latitude, longitude);
+    // const elevation = await getElevation(latitude, longitude);
+    
+    const nearestPoint = await findNearestPoint(latitude, longitude);
+
+    // Define an array of all possible n_CLAIFN values
+    const n_CLAIFNValues = [111, 112, 114, 121, 122, 124, 132, 140, 141, 142, 150, 161, 171, 172, 200, 300, 400, 500];
+
+    // Create an empty object to hold the one-hot encoded values
+    const oneHotEncoded = {};
+
+    // Iterate over the n_CLAIFN values and create corresponding one-hot encoded columns
+    n_CLAIFNValues.forEach((value) => {
+      const column = `n_CLAIFN_${value}`;
+      oneHotEncoded[column] = nearestPoint.n_CLAIFN === value ? 1 : 0;
+    });
 
     // const date = new Date("2023-05-21"); // Example date
     // const date = new Date("2023-05-21");
     // const timestamp = date.getTime();
     // const timestamp = Math.floor(Date.now() / 1000);
-    const timestamp = Math.floor(new Date("2023-05-23") / 1000);
+    // const timestamp = Math.floor(new Date("2023-05-23") / 1000);
 
     // Get the meteorological data for the coordinates
-    const meteorologicalData = await getMeteorologicalData(latitude, longitude, timestamp);
+    const meteorologicalData = await getMeteorologicalData(latitude, longitude);
 
     // Prepare the input data for the model
     // const inputData_8 = [elevation, 10, 10, ...Object.values(meteorologicalData)];
-    const inputData = [elevation, ...Object.values(meteorologicalData)];
+    // const inputData = [nearestPoint.altitud, ...Object.values(meteorologicalData)];
+
+    // Append the one-hot encoded columns to the inputData array
+    const inputData = [nearestPoint.altitud, nearestPoint.pendiente, nearestPoint.orientacion, ...Object.values(meteorologicalData), ...Object.values(oneHotEncoded)];
 
     // const inputData = [388.61575,59.145134,272.72263, ...Object.values(meteorologicalData)];
     // False:
