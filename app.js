@@ -1,16 +1,14 @@
+let points_data = null;
+
+// Fetch the GeoJSON file
+fetch('data/points_data.geojson')
+  .then(response => response.json())
+  .then(data => {
+    points_data = JSON.parse(JSON.stringify(data));
+    document.getElementById('predictBtn').disabled = false;
+  });
+
 document.addEventListener("DOMContentLoaded", function() {
-  // Define the API endpoint for elevation data
-  // const elevationAPI = "https://api.open-elevation.com/api/v1/lookup";
-  const elevationAPI = "https://api.open-meteo.com/v1/elevation";
-
-  // Mapbox Elevation API endpoint
-  const elevationAndSlopeAPI = 'https://api.open-elevation.com/api/v1/lookup';
-
-  // Define the API endpoint for meteorological data
-  const cdsAPI = "https://cds.climate.copernicus.eu/api/v2";
-
-  const bio = {};
-
 
   function calculateDistance(lat1, lon1, lat2, lon2) {
     const earthRadius = 6371; // Radius of the Earth in kilometers
@@ -37,96 +35,32 @@ document.addEventListener("DOMContentLoaded", function() {
   async function findNearestPoint(userLatitude, userLongitude) {
     let nearestPoint = null;
     let minDistance = Infinity;
-
-    try {
-      const response = await fetch('data/points_data.geojson');
-      if (!response.ok) {
-        throw new Error('Failed to fetch GeoJSON file');
-      }
-      const data = await response.json();
       
-      // Handle the loaded GeoJSON data
-      console.log(data); // Example: Log the loaded GeoJSON data
-      // Perform any further processing with the GeoJSON data
-      data.features.forEach(feature => {
-        if (feature.geometry.type === 'Point') {
-          const [pointLongitude, pointLatitude] = feature.geometry.coordinates;
-    
-          // Calculate the distance between the user's input and the current point
-          const distance = calculateDistance(userLatitude, userLongitude, pointLatitude, pointLongitude);
-    
-          // Check if the current point is closer than the previous closest point
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestPoint = feature;
-          }
+    // Handle the loaded GeoJSON data
+    console.log(points_data); // Example: Log the loaded GeoJSON data
+    // Perform any further processing with the GeoJSON data
+    points_data.features.forEach(feature => {
+      if (feature.geometry.type === 'Point') {
+        const [pointLongitude, pointLatitude] = feature.geometry.coordinates;
+  
+        // Calculate the distance between the user's input and the current point
+        const distance = calculateDistance(userLatitude, userLongitude, pointLatitude, pointLongitude);
+  
+        // Check if the current point is closer than the previous closest point
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPoint = feature;
         }
-      });
+      }
+    });
 
-      const altitud = nearestPoint.properties.altitud;
-      const pendiente = nearestPoint.properties.pendiente;
-      const orientacion = nearestPoint.properties.orientacion;
-      const n_CLAIFN = nearestPoint.properties.n_CLAIFN;
-      return { altitud, pendiente, orientacion, n_CLAIFN };
-
-    } catch (error) {
-      console.error('Error loading GeoJSON file:', error);
-    }
+    const altitud = nearestPoint.properties.altitud;
+    const pendiente = nearestPoint.properties.pendiente;
+    const orientacion = nearestPoint.properties.orientacion;
+    const n_CLAIFN = nearestPoint.properties.n_CLAIFN;
+    return { altitud, pendiente, orientacion, n_CLAIFN };
   }
   
-
-  // Function to get the elevation for given coordinates
-  // async function getElevation(latitude, longitude) {
-  //   // const url = `${elevationAPI}?locations=${latitude},${longitude}`;
-  //   const url = `${elevationAPI}?latitude=${latitude}&longitude=${longitude}`;
-  //   const response = await fetch(url);
-  //   const data = await response.json();
-  //   // const elevation = data.results[0].elevation;
-  //   const elevation = data.elevation[0];
-  //   return elevation;
-  // }
-
-  // // Function to get meteorological data for given coordinates
-  // async function getMeteorologicalData(latitude, longitude) {
-  //   const url = `${cdsAPI}/resources/reanalysis-era5-pressure-levels`;
-  //   const params = {
-  //     format: "json",
-  //     variable: [
-  //       "temperature",
-  //       "u_component_of_wind",
-  //       "v_component_of_wind",
-  //       "specific_humidity",
-  //       "relative_humidity"
-  //     ],
-  //     pressure_level: "1000",
-  //     year: "2023",
-  //     month: "01",
-  //     day: "01",
-  //     time: "00:00",
-  //     area: `${latitude - 0.25}/${longitude - 0.25}/${latitude + 0.25}/${longitude + 0.25}`,
-  //   };
-  //   const response = await fetch(`${url}?${new URLSearchParams(params)}`);
-  //   const data = await response.json();
-
-  //   const meteorologicalData = {
-  //     temperature: data.temperature[0].data[0],
-  //     uComponentOfWind: data.u_component_of_wind[0].data[0],
-  //     vComponentOfWind: data.v_component_of_wind[0].data[0],
-  //     specificHumidity: data.specific_humidity[0].data[0],
-  //     relativeHumidity: data.relative_humidity[0].data[0]
-  //   };
-
-  //   return meteorologicalData;
-  // }
-
-  // Fetch the GeoJSON file
-  // fetch('data/bio_grouped.geojson')
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     bio = data;
-  //     console.log('bio', bio)
-  // });
-
 
   // Function to calculate specific humidity (in grams of water vapor per kilogram of air)
   function calculateSpecificHumidity(temperature, relativeHumidity) {
@@ -150,32 +84,32 @@ document.addEventListener("DOMContentLoaded", function() {
     return specificHumidity;
   }
 
-  function getMeteorologicalData(latitude, longitude, timestamp) {
-    const apiKey = 'c3034e02ba05fd3aec1bc080872ba8c6';
-    // const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
-    const apiUrl = `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${timestamp}&appid=${apiKey}`;
-    // const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
+  // function getMeteorologicalData(latitude, longitude, timestamp) {
+  //   const apiKey = 'c3034e02ba05fd3aec1bc080872ba8c6';
+  //   // const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
+  //   const apiUrl = `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${timestamp}&appid=${apiKey}`;
+  //   // const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
 
-    return fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        // Process the weather data
-        const meteorologicalData = {
-          temperature: data.current.temp,
-          uComponentOfWind: data.current.wind_speed*Math.cos(data.current.wind_deg),
-          vComponentOfWind: data.current.wind_speed*Math.sin(data.current.wind_deg),
-          specificHumidity: calculateSpecificHumidity(data.current.temp, data.current.humidity),
-          relativeHumidity: data.current.humidity
-        };
+  //   return fetch(apiUrl)
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       // Process the weather data
+  //       const meteorologicalData = {
+  //         temperature: data.current.temp,
+  //         uComponentOfWind: data.current.wind_speed*Math.cos(data.current.wind_deg),
+  //         vComponentOfWind: data.current.wind_speed*Math.sin(data.current.wind_deg),
+  //         specificHumidity: calculateSpecificHumidity(data.current.temp, data.current.humidity),
+  //         relativeHumidity: data.current.humidity
+  //       };
 
-        return meteorologicalData;
-      })
-      .catch(error => {
-        console.log("Error fetching weather data:", error);
-      });
-  }
+  //       return meteorologicalData;
+  //     })
+  //     .catch(error => {
+  //       console.log("Error fetching weather data:", error);
+  //     });
+  // }
 
-  function getMeteorologicalData(latitude, longitude, timestamp) {
+  function getMeteorologicalData(latitude, longitude) {
     const apiKey = 'c3034e02ba05fd3aec1bc080872ba8c6';
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
 
@@ -183,12 +117,20 @@ document.addEventListener("DOMContentLoaded", function() {
       .then(response => response.json())
       .then(data => {
         // Process the weather data
+        // const meteorologicalData = {
+        //   temperature: data.main.temp_max,
+        //   uComponentOfWind: data.wind.speed*Math.cos(data.wind.deg),
+        //   vComponentOfWind: data.wind.speed*Math.sin(data.wind.deg),
+        //   specificHumidity: calculateSpecificHumidity(data.main.temp, data.main.humidity),
+        //   relativeHumidity: data.main.humidity
+        // };
+
         const meteorologicalData = {
-          temperature: data.main.temp_max,
-          uComponentOfWind: data.wind.speed*Math.cos(data.wind.deg),
-          vComponentOfWind: data.wind.speed*Math.sin(data.wind.deg),
-          specificHumidity: calculateSpecificHumidity(data.main.temp, data.main.humidity),
-          relativeHumidity: data.main.humidity
+          temperature: 305,
+          uComponentOfWind: 5,
+          vComponentOfWind: -2,
+          specificHumidity: calculateSpecificHumidity(data.main.temp, 30),
+          relativeHumidity: 30
         };
 
         return meteorologicalData;

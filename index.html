@@ -11,7 +11,7 @@
   <div>
     <label for="coordinates">Introducir Coordenadas:</label>
     <input type="text" id="coordinates" placeholder="Latitud, Longitud">
-    <button id="predictBtn">Predecir</button>
+    <button id="predictBtn" disabled>Predecir</button>
   </div>
   <br>
   <div>Resultado:</div>
@@ -22,7 +22,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js"></script>
   <!-- Load the points data -->
   <!-- <script src="data/points_data.geojson" id="geojson-data"></script> -->
-  <link rel="prefetch" href="data/points_data.geojson" as="fetch" crossorigin="anonymous">
+  <!-- <link rel="prefetch" href="data/points_data.geojson" as="fetch" crossorigin="anonymous"> -->
   <!-- Load the JavaScript code -->
   <script src="app.js"></script>
 </body>
