@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
     .then(data => {
       points_data = JSON.parse(JSON.stringify(data));
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('main').style.display = 'block';
+      document.getElementById('coordinates-section').style.display = 'block';
       document.getElementById('predictBtn').disabled = false;
       document.getElementById('coordinates').disabled = false;
     });

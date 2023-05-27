@@ -7,14 +7,16 @@
     <!-- Leaflet.js library -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="app.css" />
 
   <title>Predicción Riesgos de Incendios Forestales</title>
 </head>
 <body>
   <h1>Riesgo de Incendios Forestales en la Comunidad Valenciana</h1>
   <div id="map" style="height: 400px;"></div>
+  <br>
   <div id="loading">Cargando...</div>
-  <div id="main" style="display: none">
+  <div id="coordinates-section" style="display: none">
     <div>
       <label for="coordinates">Introducir Coordenadas:</label>
       <input type="text" id="coordinates" placeholder="Latitud, Longitud" disabled>
