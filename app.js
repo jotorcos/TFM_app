@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
   // Initialize the map
-  const map = L.map('map').setView([38.907, -77.037], 13);
+  const map = L.map('map').setView([39.68828263226987, -0.40374755859375006], 8);
 
   // Add a tile layer (e.g., OpenStreetMap)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
