@@ -1,3 +1,57 @@
+#container {
+  height: 600px;
+  display: inline-block;
+}
+
+#map {
+  width: 99vw;
+  display: inline-block;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 769px) {
+  #map {
+    width: 40vw;
+  }
+}
+
+#coordinates-section, #loading {
+  display: inline-block;
+  vertical-align: top;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
 input {
   width: 300px;
+  margin-bottom: 10px;
+}
+
+.predict-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #6ab7ff;
+  border-radius: 5px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+  
+.predict-btn:hover {
+  background-color: #3d9eff;
+}
+
+.predict-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(106, 183, 255, 0.4);
 }

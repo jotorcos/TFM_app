@@ -17,13 +17,14 @@ document.addEventListener("DOMContentLoaded", function() {
     .then(data => {
       points_data = JSON.parse(JSON.stringify(data));
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('coordinates-section').style.display = 'block';
+      document.getElementById('coordinates-section').style.display = 'inline-block';
       document.getElementById('predictBtn').disabled = false;
       document.getElementById('coordinates').disabled = false;
     });
 
   // Initialize the map
-  const map = L.map('map').setView([39.68828263226987, -0.40374755859375006], 8);
+  const mapContainer = document.getElementById('map');
+  const map = L.map(mapContainer).setView([39.07837506689215, -0.35200661861346516], 8);
 
   // Add a tile layer (e.g., OpenStreetMap)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -85,6 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (minDistance > 5) {
       return null;
     }
+
     const altitud = nearestPoint.properties.altitud;
     const pendiente = nearestPoint.properties.pendiente;
     const orientacion = nearestPoint.properties.orientacion;

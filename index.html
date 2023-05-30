@@ -13,19 +13,20 @@
 </head>
 <body>
   <h1>Riesgo de Incendios Forestales en la Comunidad Valenciana</h1>
-  <div id="map" style="height: 400px;"></div>
-  <br>
-  <div id="loading">Cargando...</div>
-  <div id="coordinates-section" style="display: none">
-    <div>
-      <label for="coordinates">Introducir Coordenadas:</label>
-      <input type="text" id="coordinates" placeholder="Latitud, Longitud" disabled>
-      <button id="predictBtn" disabled>Predecir</button>
+  <div id="container">
+    <div id="map" style="height: 600px;"></div>
+    <div id="loading">Cargando...</div>
+    <div id="coordinates-section" style="display: none">
+      <div>
+        <label for="coordinates">Introducir Coordenadas</label>
+        <input type="text" id="coordinates" placeholder="Latitud, Longitud" disabled>
+        <button id="predictBtn" class="predict-btn" disabled>Predecir</button>
+      </div>
+      <br>
+      <div>Resultado:</div>
+      <br>
+      <div id="result"></div>
     </div>
-    <br>
-    <div>Resultado:</div>
-    <br>
-    <div id="result"></div>
   </div>
 
   <!-- Include TensorFlow.js library -->
