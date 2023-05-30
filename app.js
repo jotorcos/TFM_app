@@ -27,10 +27,13 @@ document.addEventListener("DOMContentLoaded", function() {
   const map = L.map(mapContainer).setView([39.07837506689215, -0.35200661861346516], 8);
 
   // Add a tile layer (e.g., OpenStreetMap)
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    maxZoom: 18,
-  }).addTo(map);
+    maxZoom: 12
+  });
+
+  osmLayer.addTo(map);
+
 
   // Add a click event listener to the map
   map.on('click', function (e) {
