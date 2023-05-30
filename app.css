@@ -25,6 +25,7 @@ body {
 #coordinates-section, #loading {
   display: inline-block;
   vertical-align: top;
+  margin-bottom: 40px;
 }
 
 label {
