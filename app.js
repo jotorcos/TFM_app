@@ -110,6 +110,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function getMeteorologicalData(latitude, longitude) {
+    const apiKey = 'c3034e02ba05fd3aec1bc080872ba8c6';
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
 
     return fetch(apiUrl)
