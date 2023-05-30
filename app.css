@@ -2,23 +2,39 @@ body {
   font-size: 16px;
   font-weight: bold;
   color: #333333;
+  text-align: center;
+}
+
+@media (min-width: 769px) {
+  body {
+    text-align: left;
+  }
 }
 
 #container {
-  height: 600px;
+  height: 400px;
   display: inline-block;
 }
 
+@media (min-width: 769px) {
+  #container {
+    height: 600px;
+  }
+}
+
 #map {
-  width: 99vw;
+  height: 300px;
+  width: 98vw;
   display: inline-block;
-  margin-right: 20px;
+  margin-right: 5px;
   margin-bottom: 20px;
 }
 
 @media (min-width: 769px) {
   #map {
-    width: 40vw;
+    height: 600px;
+    width: 45vw;
+    margin-right: 20px;
   }
 }
 
