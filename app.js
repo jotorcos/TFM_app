@@ -66,8 +66,6 @@ document.addEventListener("DOMContentLoaded", function() {
     let nearestPoint = null;
     let minDistance = Infinity;
       
-    // Handle the loaded GeoJSON data
-    console.log(points_data); // Example: Log the loaded GeoJSON data
     // Perform any further processing with the GeoJSON data
     points_data.features.forEach(feature => {
       if (feature.geometry.type === 'Point') {
@@ -142,7 +140,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const getPrediction = async (prediction) => {
     const predictedValue = await prediction.data();
-    console.log('predictedValue', `${predictedValue[0]},${predictedValue[1]}`);
     const result = predictedValue[1] > predictedValue[0] ? 1 : 0;
     return result;
   }
