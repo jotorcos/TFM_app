@@ -82,6 +82,9 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
 
+    if (minDistance > 5) {
+      return null;
+    }
     const altitud = nearestPoint.properties.altitud;
     const pendiente = nearestPoint.properties.pendiente;
     const orientacion = nearestPoint.properties.orientacion;
@@ -156,6 +159,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const [latitude, longitude] = coordinatesInput.split(",").map(coord => parseFloat(coord.trim()));
     
     const nearestPoint = await findNearestPoint(latitude, longitude);
+
+    if (!nearestPoint) {
+      resultDiv.textContent = 'Las coordenadas introducidas están demasiado lejos';
+      return;
+    }
 
     // Define an array of all possible n_CLAIFN values
     const n_CLAIFNValues = [111, 112, 114, 121, 122, 124, 132, 140, 141, 142, 150, 161, 171, 172, 200, 300, 400, 500];
