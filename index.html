@@ -15,7 +15,11 @@
   <h1>Riesgo de Incendios Forestales en la Comunidad Valenciana</h1>
   <div id="container">
     <div id="map" style="height: 600px;"></div>
-    <div id="loading">Cargando...</div>
+    <div id="loading">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+      </div>
+    </div>
     <div id="coordinates-section" style="display: none">
       <div>
         <label for="coordinates">Introducir Coordenadas</label>
@@ -23,7 +27,7 @@
         <button id="predictBtn" class="predict-btn" disabled>Predecir</button>
       </div>
       <br>
-      <div>Resultado:</div>
+      <div class="result-title">Resultado</div>
       <br>
       <div id="result"></div>
     </div>

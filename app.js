@@ -153,8 +153,10 @@ document.addEventListener("DOMContentLoaded", function() {
   async function predict() {
     const coordinatesInput = document.getElementById("coordinates").value;
 
+    resultDiv.classList.remove('risk', 'no-risk');
+
     if (!coordinatesInput) {
-      resultDiv.textContent = "Please enter coordinates.";
+      resultDiv.textContent = "Por favor, introduzca las coordenadas.";
       return;
     }
 
@@ -163,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const nearestPoint = await findNearestPoint(latitude, longitude);
 
     if (!nearestPoint) {
-      resultDiv.textContent = 'Las coordenadas introducidas están demasiado lejos';
+      resultDiv.textContent = 'Las coordenadas introducidas están demasiado lejos.';
       return;
     }
 
@@ -196,9 +198,15 @@ document.addEventListener("DOMContentLoaded", function() {
     // Get the predicted value
     const fireRisk = await getPrediction(prediction);
 
-    const fireRiskDictionary = {0: 'No hay riesgo de incendio', 1: 'Hay riesgo de incendio'}
+    const fireRiskDictionary = {0: 'No hay riesgo de incendio.', 1: 'Hay riesgo de incendio.'}
 
     resultDiv.textContent = `${fireRiskDictionary[fireRisk]}`;
+
+    if (fireRisk == 1) {
+      resultDiv.classList.add('risk');
+    } else {
+      resultDiv.classList.add('no-risk');
+    }
   }
 
   // Event listener for the predict button

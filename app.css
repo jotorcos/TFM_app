@@ -1,3 +1,9 @@
+body {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+}
+
 #container {
   height: 600px;
   display: inline-block;
@@ -23,12 +29,28 @@
 
 label {
   display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
   margin-bottom: 5px;
 }
 
 input {
   width: 300px;
   margin-bottom: 10px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 2px solid #3498db;
+  background-color: #f2f2f2;
+  color: #333333;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #6cb2eb;
+  box-shadow: 0 0 5px #6cb2eb;
 }
 
 .predict-btn {
@@ -55,3 +77,42 @@ input {
   outline: none;
   box-shadow: 0 0 0 3px rgba(106, 183, 255, 0.4);
 }
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 6px solid #555555;
+  border-top-color: #ffffff;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.result-title {
+  text-decoration: underline;
+  font-size: 20px;
+}
+
+.risk {
+  color: #FF3366;
+}
+
+.no-risk {
+  color: #33CC66;
+}
+
