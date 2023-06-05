@@ -34,12 +34,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
   osmLayer.addTo(map);
 
+  let markerIcon = L.icon({
+    iconUrl: 'assets/forest.png',
+    iconSize: [25, 41],
+  });
+
+  let marker = null;
 
   // Add a click event listener to the map
   map.on('click', function (e) {
+
+    markerIcon = L.icon({
+      iconUrl: 'assets/forest.png',
+      iconSize: [25, 41],
+    });
+
+    if (marker) {
+      map.removeLayer(marker); // Remove the previous marker from the map
+    }
+
     // Get the clicked coordinates
     const lat = e.latlng.lat;
     const lng = e.latlng.lng;
+
+    marker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
 
     // Update the input field with the coordinates
     document.getElementById('coordinates').value = lat + ', ' + lng;
@@ -207,9 +225,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (fireRisk == 1) {
       resultDiv.classList.add('risk');
+
+      markerIcon = L.icon({
+        iconUrl: 'assets/trees_fire.png',
+        iconSize: [25, 41],
+      });
+
     } else {
       resultDiv.classList.add('no-risk');
+
+      markerIcon = L.icon({
+        iconUrl: 'assets/trees_no_fire.png',
+        iconSize: [25, 41],
+      });
     }
+
+    if (marker) {
+      map.removeLayer(marker);
+    }
+
+    marker = L.marker([latitude, longitude], { icon: markerIcon }).addTo(map);
   }
 
   // Event listener for the predict button
