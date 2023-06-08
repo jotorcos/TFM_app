@@ -6,6 +6,28 @@ document.addEventListener("DOMContentLoaded", function() {
   const MOLECULAR_WEIGHT_WATER = 18.01528; // g/mol
   const GAS_CONSTANT_GRAMS = 8314; // J/(g·K)
 
+  const MEANS = { 
+    "altitud": 446.083088,
+    "pendiente": 28.564042,
+    "orientacion": 170.111652,
+    "t_max": 299.449704,
+    "u": 0.833451,
+    "v": 0.029887,
+    "specific_humidity": 0.006179,
+    "relative_humidity": 35.056203
+  };
+
+  const STDS = {
+    "altitud": 317.022152,
+    "pendiente": 26.731821,
+    "orientacion": 102.814267,
+    "t_max": 8.523888,
+    "u": 1.99291,
+    "v": 1.443016,
+    "specific_humidity": 0.002585,
+    "relative_humidity": 17.824743
+  }              
+
   // Section to display the result
   let resultDiv = document.getElementById("result");
 
@@ -170,6 +192,20 @@ document.addEventListener("DOMContentLoaded", function() {
     return result;
   }
 
+  const normalizeNumericData = (data) => {
+    const normalizedData = [
+      (data[0] - MEANS.altitud) / STDS.altitud,
+      (data[1] - MEANS.pendiente) / STDS.pendiente,
+      (data[2] - MEANS.orientacion) / STDS.orientacion,
+      (data[3] - MEANS.t_max) / STDS.t_max,
+      (data[4] - MEANS.u) / STDS.u,
+      (data[5] - MEANS.v) / STDS.v,
+      (data[6] - MEANS.specific_humidity) / STDS.specific_humidity,
+      (data[7] - MEANS.relative_humidity) / STDS.relative_humidity
+    ]
+    return normalizedData;
+  }
+
   // Function to handle the prediction
   async function predict() {
     const coordinatesInput = document.getElementById("coordinates").value;
@@ -205,8 +241,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // Get the meteorological data for the coordinates
     const meteorologicalData = await getMeteorologicalData(latitude, longitude);
 
+    const normalizedNumericData = normalizeNumericData([nearestPoint.altitud , nearestPoint.pendiente, nearestPoint.orientacion, ...Object.values(meteorologicalData)]);
+
     // Append the one-hot encoded columns to the inputData array
-    const inputData = [nearestPoint.altitud, nearestPoint.pendiente, nearestPoint.orientacion, ...Object.values(meteorologicalData), ...Object.values(oneHotEncoded)];
+    const inputData = [...Object.values(normalizedNumericData), ...Object.values(oneHotEncoded)];
 
     resultDiv.textContent = 'Cargando...';
 
