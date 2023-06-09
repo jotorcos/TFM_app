@@ -56,6 +56,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
   osmLayer.addTo(map);
 
+  fetch('data/simplified_border.geojson')
+    .then(response => response.json())
+    .then(data => {
+      L.geoJSON(data).addTo(map);
+    });
+
   let markerIcon = L.icon({
     iconUrl: 'assets/forest.png',
     iconSize: [25, 41],
