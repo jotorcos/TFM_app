@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const MOLECULAR_WEIGHT_WATER = 18.01528; // g/mol
   const GAS_CONSTANT_GRAMS = 8314; // J/(g·K)
 
+  // Constants from the data points before normalizing
   const MEANS = { 
     "altitud": 446.083088,
     "pendiente": 28.564042,
@@ -48,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const mapContainer = document.getElementById('map');
   const map = L.map(mapContainer).setView([39.07837506689215, -0.35200661861346516], 8);
 
-  // Add a tile layer (e.g., OpenStreetMap)
+  // Add a tile layer
   const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
     maxZoom: 12
@@ -172,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function() {
       .then(data => {
         // Process the weather data
         const meteorologicalData = {
-          temperature: data.main.temp_max,
+          temperature: data.main.temp,
           uComponentOfWind: data.wind.speed*Math.cos(data.wind.deg),
           vComponentOfWind: data.wind.speed*Math.sin(data.wind.deg),
           specificHumidity: calculateSpecificHumidity(data.main.temp, data.main.humidity),
