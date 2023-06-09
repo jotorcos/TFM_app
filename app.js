@@ -130,11 +130,13 @@ document.addEventListener("DOMContentLoaded", function() {
       return null;
     }
 
+    const latitude = nearestPoint.geometry.coordinates[1];
+    const longitude = nearestPoint.geometry.coordinates[0];
     const altitud = nearestPoint.properties.altitud;
     const pendiente = nearestPoint.properties.pendiente;
     const orientacion = nearestPoint.properties.orientacion;
     const n_CLAIFN = nearestPoint.properties.n_CLAIFN;
-    return { altitud, pendiente, orientacion, n_CLAIFN };
+    return { latitude, longitude, altitud, pendiente, orientacion, n_CLAIFN };
   }
   
 
@@ -181,8 +183,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Load the TensorFlow.js model
   async function loadModel() {
-    // const modelJson = {"format": "layers-model", "generatedBy": "keras v2.12.0", "convertedBy": "TensorFlow.js Converter v4.6.0", "modelTopology": {"keras_version": "2.12.0", "backend": "tensorflow", "model_config": {"class_name": "Sequential", "config": {"name": "sequential", "layers": [{"class_name": "InputLayer", "config": {"batch_input_shape": [null, 8], "dtype": "float32", "sparse": false, "ragged": false, "name": "dense_input"}}, {"class_name": "Dense", "config": {"name": "dense", "trainable": true, "dtype": "float32", "batch_input_shape": [null, 8], "units": 64, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_1", "trainable": true, "dtype": "float32", "units": 128, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_1", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_2", "trainable": true, "dtype": "float32", "units": 256, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_2", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_3", "trainable": true, "dtype": "float32", "units": 128, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_3", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_4", "trainable": true, "dtype": "float32", "units": 64, "activation": "relu", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": {"class_name": "MaxNorm", "config": {"max_value": 1, "axis": 0}}, "bias_constraint": null}}, {"class_name": "Dropout", "config": {"name": "dropout_4", "trainable": true, "dtype": "float32", "rate": 0.3, "noise_shape": null, "seed": null}}, {"class_name": "Dense", "config": {"name": "dense_5", "trainable": true, "dtype": "float32", "units": 2, "activation": "softmax", "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}}, "bias_initializer": {"class_name": "Zeros", "config": {}}, "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer": null, "kernel_constraint": null, "bias_constraint": null}}]}}, "training_config": {"loss": "sparse_categorical_crossentropy", "metrics": [[{"class_name": "MeanMetricWrapper", "config": {"name": "accuracy", "dtype": "float32", "fn": "sparse_categorical_accuracy"}}]], "weighted_metrics": null, "loss_weights": null, "optimizer_config": {"class_name": "Custom>Adamax", "config": {"name": "Adamax", "weight_decay": null, "clipnorm": null, "global_clipnorm": null, "clipvalue": null, "use_ema": false, "ema_momentum": 0.99, "ema_overwrite_frequency": null, "jit_compile": false, "is_legacy_optimizer": false, "learning_rate": 0.0010000000474974513, "beta_1": 0.9, "beta_2": 0.999, "epsilon": 1e-07}}}}, "weightsManifest": [{"paths": ["group1-shard1of1.bin"], "weights": [{"name": "dense/kernel", "shape": [8, 64], "dtype": "float32"}, {"name": "dense/bias", "shape": [64], "dtype": "float32"}, {"name": "dense_1/kernel", "shape": [64, 128], "dtype": "float32"}, {"name": "dense_1/bias", "shape": [128], "dtype": "float32"}, {"name": "dense_2/kernel", "shape": [128, 256], "dtype": "float32"}, {"name": "dense_2/bias", "shape": [256], "dtype": "float32"}, {"name": "dense_3/kernel", "shape": [256, 128], "dtype": "float32"}, {"name": "dense_3/bias", "shape": [128], "dtype": "float32"}, {"name": "dense_4/kernel", "shape": [128, 64], "dtype": "float32"}, {"name": "dense_4/bias", "shape": [64], "dtype": "float32"}, {"name": "dense_5/kernel", "shape": [64, 2], "dtype": "float32"}, {"name": "dense_5/bias", "shape": [2], "dtype": "float32"}]}]};
-    const model = await tf.loadLayersModel("model_26_optimized/model.json");
+    const model = await tf.loadLayersModel("model/model.json");
     return model;
   }
 
@@ -239,13 +240,13 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Get the meteorological data for the coordinates
-    const meteorologicalData = await getMeteorologicalData(latitude, longitude);
+    const meteorologicalData = await getMeteorologicalData(nearestPoint.latitude, nearestPoint.longitude);
 
     const normalizedNumericData = normalizeNumericData([nearestPoint.altitud , nearestPoint.pendiente, nearestPoint.orientacion, ...Object.values(meteorologicalData)]);
 
     // Append the one-hot encoded columns to the inputData array
     const inputData = [...Object.values(normalizedNumericData), ...Object.values(oneHotEncoded)];
-
+    
     resultDiv.textContent = 'Cargando...';
 
     // Load the model
@@ -282,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function() {
       map.removeLayer(marker);
     }
 
-    marker = L.marker([latitude, longitude], { icon: markerIcon }).addTo(map);
+    marker = L.marker([nearestPoint.latitude, nearestPoint.longitude], { icon: markerIcon }).addTo(map);
   }
 
   // Event listener for the predict button
