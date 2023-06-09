@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function() {
       map.removeLayer(marker);
     }
 
-    marker = L.marker([nearestPoint.latitude, nearestPoint.longitude], { icon: markerIcon }).addTo(map);
+    marker = L.marker([latitude, longitude], { icon: markerIcon }).addTo(map);
   }
 
   // Event listener for the predict button
