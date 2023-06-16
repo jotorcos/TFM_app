@@ -46,22 +46,56 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
   // Initialize the map
-  const mapContainer = document.getElementById('map');
-  const map = L.map(mapContainer).setView([39.07837506689215, -0.35200661861346516], 8);
+  IDEVAPI_global = {
+    idioma: "es",
+    mostrarNombresCampos: false
+  }
+  IDEVAPI = [{
+    mapabase : "IMAGEN",
+    mapabaseDisponibles : "IMAGEN,BASICO,TOPOGRAFICO,HIBRIDO",
+    zoomInicio : 7,
+    zoomMaximo: 12,
+    extInicio: [[37.832,-0.41],[40.794,-0.4]],
+    controlZoom : true,
+    controlHome : false,
+    controlCoords : true,
+    controlCoordsSRS : 25830,
+    id: "map",
+    capas : [
+      {
+        tipo: 'WMS',
+        titulo: 'Parques Naturales;Parcs Naturals',
+        servicio: 'Espacios_Protegidos',
+        capas: '16',
+        opacidad: 0.9,
+        TOCNivel1: null,
+        TOCNivel2: null,
+        leyenda: {
+          titulo: '',
+          alineacion: 'vertical'
+        },
+        leyendaAlin: 'vertical',
+        mostrarInfo: true,
+        tablaConsulta: null
+      },
+      {
+        tipo: 'WMS',
+        titulo: 'Otro',
+        servicio:{
+          url:"https://carto.icv.gva.es/arcgis/services/tm_medio_ambiente/avamet/MapServer/WMSServer",
+          formato:"image/png"
+        },
+        capas: 'Ultimos10dias',
+        opacidad: 0.9,
+        tablaInfo: {
+          activo:true
+        }
+      },
+    ],
+  }];
 
-  // Add a tile layer
-  const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    maxZoom: 12
-  });
-
-  osmLayer.addTo(map);
-
-  fetch('data/simplified_border.geojson')
-    .then(response => response.json())
-    .then(data => {
-      L.geoJSON(data).addTo(map);
-    });
+  const paramsReturned = iniciarIdevAPI(IDEVAPI,IDEVAPI_global);
+  const map = paramsReturned[0];
 
   let markerIcon = L.icon({
     iconUrl: 'assets/forest.png',
