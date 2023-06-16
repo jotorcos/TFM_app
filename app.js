@@ -78,19 +78,6 @@ document.addEventListener("DOMContentLoaded", function() {
         mostrarInfo: true,
         tablaConsulta: null
       },
-      {
-        tipo: 'WMS',
-        titulo: 'Otro',
-        servicio:{
-          url:"https://carto.icv.gva.es/arcgis/services/tm_medio_ambiente/avamet/MapServer/WMSServer",
-          formato:"image/png"
-        },
-        capas: 'Ultimos10dias',
-        opacidad: 0.9,
-        tablaInfo: {
-          activo:true
-        }
-      },
     ],
   }];
 
