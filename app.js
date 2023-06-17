@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   IDEVAPI = [{
     mapabase : "IMAGEN",
-    mapabaseDisponibles : "IMAGEN,BASICO,TOPOGRAFICO,HIBRIDO",
+    mapabaseDisponibles : "HIBRIDO,IMAGEN,TOPOGRAFICO,GRIS,BASICO",
     zoomInicio : 7,
     zoomMaximo: 12,
     extInicio: [[37.832,-0.41],[40.794,-0.4]],
@@ -60,14 +60,15 @@ document.addEventListener("DOMContentLoaded", function() {
     controlHome : false,
     controlCoords : true,
     controlCoordsSRS : 25830,
+    controlCargarCapas: true,
     id: "map",
     capas : [
       {
         tipo: 'WMS',
-        titulo: 'Parques Naturales;Parcs Naturals',
+        titulo: 'Parques Naturales',
         servicio: 'Espacios_Protegidos',
-        capas: '16',
-        opacidad: 0.9,
+        capas: '5',
+        opacidad: 0.5,
         TOCNivel1: null,
         TOCNivel2: null,
         leyenda: {
@@ -76,7 +77,8 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         leyendaAlin: 'vertical',
         mostrarInfo: true,
-        tablaConsulta: null
+        tablaConsulta: null,
+        visibleInicio: false
       },
     ],
   }];

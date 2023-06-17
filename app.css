@@ -45,6 +45,11 @@ body {
   margin-bottom: 20px;
 }
 
+#map .leaflet-bottom.leaflet-left .leaflet-control-layers.leaflet-control-layers-expanded label,
+#map .leaflet-bottom.leaflet-left .leaflet-control-layers.leaflet-control-layers-expanded label > div {
+  display: flex;
+}
+
 @media (min-width: 769px) {
   #map {
     height: 600px;
