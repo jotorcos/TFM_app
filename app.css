@@ -2,6 +2,7 @@ html {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  font-family: 'Roboto';
 }
 
 *, *:before, *:after {
@@ -48,6 +49,22 @@ body {
 #map .leaflet-bottom.leaflet-left .leaflet-control-layers.leaflet-control-layers-expanded label,
 #map .leaflet-bottom.leaflet-left .leaflet-control-layers.leaflet-control-layers-expanded label > div {
   display: flex;
+}
+
+#map .leaflet-layerstree-header-label {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#map .leaflet-layerstree-header-label:last-child {
+  margin-bottom: 0;
+}
+
+#map .leaflet-layerstree-header-label .leaflet-layerstree-header-name {
+  white-space: nowrap;
+  margin-left: 5px;
 }
 
 @media (min-width: 769px) {

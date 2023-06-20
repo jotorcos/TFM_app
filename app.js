@@ -71,11 +71,6 @@ document.addEventListener("DOMContentLoaded", function() {
         opacidad: 0.5,
         TOCNivel1: null,
         TOCNivel2: null,
-        leyenda: {
-          titulo: '',
-          alineacion: 'vertical'
-        },
-        leyendaAlin: 'vertical',
         mostrarInfo: true,
         tablaConsulta: null,
         visibleInicio: false
